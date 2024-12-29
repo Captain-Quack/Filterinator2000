@@ -1,0 +1,174 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Filterinator2000.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Filterinator2000.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Filterinator2000">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    <!-- navigation bar with file, edit, view, etc. -->
+    <!-- Instead of StackPanel for the whole Window, use a Grid. -->
+    <Grid RowDefinitions="Auto,*">
+        
+        <!-- TOP ROW (Auto): your 'navigation bar' -->
+        <StackPanel x:Name="StackPanelTop" Grid.Row="0" Orientation="Horizontal" Height="50"  Margin="10">
+
+
+            <Button
+                x:Name="SearchButton"
+                Width="60"
+                Height="40"
+                Margin="10 0"
+                Click="Search">
+                <Svg Path="/Assets/search.svg" />
+            </Button>
+            
+            
+            
+            <AutoCompleteBox
+                x:Name="SBox"
+                Watermark="Search..."
+                Width="200"
+                Height="40"
+                TextChanged="SBox_OnTextChanged"
+                KeyDown="SBox_OnKeyDown"
+                LostFocus="Search"
+                Margin="10 5"/>
+            
+            <CheckBox
+                Padding="5 5"
+                x:Name="TossupOrBonus"
+                IsChecked="True"
+                IsThreeState="True"
+                Margin="10"
+                Content="Tossups &amp; Bonuses"
+                IsCheckedChanged="SettingChanged"/>
+
+            <CheckBox
+                Padding="5 5"
+                x:Name="QuestionOrAnswer"
+                IsChecked="True"
+                IsThreeState="True"
+                Margin="10"
+                Content="Question &amp; Answer"
+                IsCheckedChanged="SettingChanged"/>
+            
+            <CheckBox
+                Padding="5 5"
+                x:Name="ExactPhrase"
+                IsChecked="{x:Null}"
+                IsThreeState="True"
+                Margin="10"
+                Content="Similar"
+                IsCheckedChanged="SettingChanged"/>
+
+            <ComboBox x:Name="Difficulties"
+                      SelectedIndex="0"
+                      Width="200"
+                      Height="40"
+                      MaxDropDownHeight="200"
+                      IsDropDownOpen="True"
+                      DropDownClosed="Difficulties_OnDropDownClosed"
+                      Margin="15,10,10,10">
+                <!--“Title” item (disabled)-->
+                <ComboBoxItem IsEnabled="False"
+                              Content="Difficulties" />
+                <!--Difficulty Options-->
+                <ComboBoxItem  Padding="5 " Height="40" >
+                    <CheckBox Tag="0" Height="41" Padding="10" Margin="0 0 0 0" VerticalContentAlignment="Stretch"  Width="200" Content="0 - Trash" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+                <!-- Padding="15 10 30 10" --> 
+                <ComboBoxItem  Padding="5 " Height="40" >
+                    <CheckBox Tag="1" Height="41" Padding="10" Margin="0 0 0 0" VerticalContentAlignment="Stretch"  Width="200" 
+                              Content="1 - Middle School" 
+                              IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+                <ComboBoxItem Padding="5 " Height="40" >
+                    <CheckBox Tag="2" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="2 - Easy High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"  />
+                </ComboBoxItem>
+                
+                <ComboBoxItem Padding="5 " Height="40" >
+                    <CheckBox  Tag="3" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="3 - Regular High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"  />
+                </ComboBoxItem>
+                <ComboBoxItem Padding="5 " Height="40" >
+                    <CheckBox  Tag="4" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200" Content="4 - Hard High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"  />
+                </ComboBoxItem>
+                <ComboBoxItem Padding="5 " Height="40" >
+                    <CheckBox  Tag="5" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200" Content="5 - Nationals High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+                <ComboBoxItem  Padding="5 " Height="40" >
+                    <CheckBox  Tag="6" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="6 - Easy College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+                <ComboBoxItem   Padding="5 " Height="40" >
+                    <CheckBox Tag="7" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="7 - Regular College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+                <ComboBoxItem  Tag="1"  Padding="5 " Height="40" >
+                    <CheckBox Tag="8" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="8 - Hard College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+                <ComboBoxItem Padding="5 " Height="40">
+                    <CheckBox Tag="9" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="9 - Nationals College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+                <ComboBoxItem Padding="5" Height="40">
+                    <CheckBox Tag="10"  Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200" Content="10 - Open" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
+                </ComboBoxItem>
+            </ComboBox>         
+        </StackPanel>
+
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,*"
+              Margin="10"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            
+            <ScrollViewer Grid.Column="0"
+                          BorderBrush="Black"
+                          BorderThickness="2"
+                          VerticalScrollBarVisibility="Auto">
+                <ListBox
+                         ItemsSource="{Binding Results}" 
+                         SelectionMode="Single" Background="WhiteSmoke"
+                         >
+                    
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="5,2"
+                                    CornerRadius="4"
+                                    BorderBrush="Gray"
+                                    BorderThickness="1">
+                                <TextBlock Text="{Binding}"
+                                           Margin="10"
+                                           TextWrapping="Wrap"/>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+
+            <ScrollViewer Grid.Column="1"
+                          Margin="10 0 30 0"
+                          VerticalScrollBarVisibility="Auto">
+                <!--edit?--> 
+                <TextBox x:Name="TextDump"
+                         Text="{Binding TextDump, FallbackValue='Wait..'}"
+                         TextAlignment="Start"
+                         TextWrapping="WrapWithOverflow" 
+                />
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>
+

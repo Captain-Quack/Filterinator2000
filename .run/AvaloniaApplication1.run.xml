@@ -1,0 +1,17 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AvaloniaApplication1" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false">
+    <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/AvaloniaApplication1/AvaloniaApplication1.csproj" />
+    <option name="PROJECT_TFM" value="net9.0" />
+    <option name="LAUNCH_PROFILE_NAME" value="" />
+    <option name="TRACK_ARGUMENTS" value="1" />
+    <option name="ARGUMENTS" value="" />
+    <option name="TRACK_WORKING_DIRECTORY" value="1" />
+    <option name="WORKING_DIRECTORY" value="" />
+    <option name="TRACK_ENVS" value="1" />
+    <option name="USE_PODMAN_RUNTIME" value="0" />
+    <option name="TRACK_URL" value="1" />
+    <method v="2">
+      <option name="Build" projectName="Selected project" />
+    </method>
+  </configuration>
+</component>

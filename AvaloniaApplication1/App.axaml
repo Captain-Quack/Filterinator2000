@@ -1,0 +1,20 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Filterinator2000.App"
+             xmlns:local="using:Filterinator2000"
+             xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             RequestedThemeVariant="Light">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+             
+    <Application.Styles>
+        <FluentTheme/>
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="Noto Sans, Segoe UI, Roboto, Unifont, San Francisco, Arial"/>
+        </Style>
+        <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
+    </Application.Styles>
+</Application>
