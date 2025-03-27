@@ -6,33 +6,37 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Filterinator2000.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
         Title="Filterinator2000">
+    
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-    <!-- navigation bar with file, edit, view, etc. -->
-    <!-- Instead of StackPanel for the whole Window, use a Grid. -->
+
+    <!--navigation bar with file, edit, view, etc.-->
+    <!--Instead of StackPanel for the Window, use a Grid.-->
     <Grid RowDefinitions="Auto,*">
         
         <!-- TOP ROW (Auto): your 'navigation bar' -->
-        <StackPanel x:Name="StackPanelTop" Grid.Row="0" Orientation="Horizontal" Height="50"  Margin="10">
-
+        <StackPanel  x:Name="StackPanelTop" Grid.Row="0" Orientation="Horizontal" Height="50"  Margin="10">
+            <Button/>
 
             <Button
                 x:Name="SearchButton"
                 Width="60"
                 Height="40"
-                Margin="10 0"
-                Click="Search">
-                <Svg Path="/Assets/search.svg" />
+                Margin="10  0 -5 0"
+                Background="White"
+                BorderBrush="Black"
+                BorderThickness="1"
+                
+                Click="Search" >
+                <Svg Path="Assets\search.svg"/>
             </Button>
             
-            
-            
+       
             <AutoCompleteBox
                 x:Name="SBox"
                 Watermark="Search..."
@@ -40,133 +44,254 @@
                 Height="40"
                 TextChanged="SBox_OnTextChanged"
                 KeyDown="SBox_OnKeyDown"
-                LostFocus="Search"
-                Margin="10 5"/>
+                PointerExited="Search"
+                BorderBrush="Black"
+                Margin="10 5 10 5"/>
             
-            <CheckBox
-                Padding="5 5"
-                x:Name="TossupOrBonus"
-                IsChecked="True"
-                IsThreeState="True"
-                Margin="10"
-                Content="Tossups &amp; Bonuses"
-                IsCheckedChanged="SettingChanged"/>
+              <Button Content="Category"
+                    Background="White"
+                    BorderBrush="Black"
+                    Height="40"
+                    Width="130"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
 
-            <CheckBox
-                Padding="5 5"
-                x:Name="QuestionOrAnswer"
-                IsChecked="True"
-                IsThreeState="True"
-                Margin="10"
-                Content="Question &amp; Answer"
-                IsCheckedChanged="SettingChanged"/>
+                <Button.Flyout>
+                    <MenuFlyout>
+
+                        <!-- Main "Literature" item -->
+                        <MenuItem Header="Literature" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}">
+                            <!-- Direct sub-items -->
+                            <MenuItem Header="American Literature"  StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"  Tag="{x:False}" />
+                            <MenuItem Header="British Literature"   StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"  Tag="{x:False}"/>
+                            <MenuItem Header="Classical Literature" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"  Tag="{x:False}"/>
+                            <MenuItem Header="World Literature"     StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"  Tag="{x:False}"/>
+                            <MenuItem Header="Other Literature"     StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"  Tag="{x:False}"/>
+                            <MenuItem Header="-" />
+
+                            <!-- Nested "Alternate" submenu -->
+                            <MenuItem Header="Alternate" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}">
+                                <MenuItem Header="Drama" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"/>
+                                <MenuItem Header="Long Fiction" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Short Fiction" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"  />
+                                <MenuItem Header="Poetry" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Misc Literature" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter"  />
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Header="History" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}">
+                            <MenuItem Header="American History" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="European History" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="World History" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Ancient History" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Other History" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            </MenuItem>
+                        
+                        <MenuItem Header="Science" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}">
+                            <MenuItem Header="Biology" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Chemistry" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Physics" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Other Science" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter">
+                                <MenuItem Header="Math" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Astronomy" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Computer Science" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Earth Science" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Engineering" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Misc Science" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            </MenuItem>
+                            </MenuItem>
+                        <MenuItem Header="Fine Arts" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}">
+                            <MenuItem Header="Visual Fine Arts" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Auditory Fine Arts" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Other Fine Arts" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" >
+                                <MenuItem Header="Architecture" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Dance" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Film" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Jazz" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Opera" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Photography" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                                <MenuItem Header="Misc Arts" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            </MenuItem>
+                            </MenuItem>
+                        <MenuItem Header="Religion" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}"/>
+                        <MenuItem Header="Mythology" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}"/>
+                        <MenuItem Header="Philosophy" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}"/>
+                        <MenuItem Header="Social Science" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}">
+                            <MenuItem Header="Anthropology" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Economics" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Linguistics" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Psychology" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Sociology" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                            <MenuItem Header="Other Social Science" Tag="{x:False}" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" />
+                        </MenuItem>
+                        <MenuItem Header="Current Events" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}"/>
+                        <MenuItem Header="Geography" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}"/>
+                        <MenuItem Header="Trash" StaysOpenOnClick="True" PointerPressed="ToggleCategoryFilter" Tag="{x:False}"/>
+                        <MenuItem Header="-" />
+                        <MenuItem Tag="{x:False}" Header="Toggle All" StaysOpenOnClick="True" PointerPressed="ToggleAllCategories"/>
+                        <MenuItem Header="Close" />
+                            
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
             
-            <CheckBox
-                Padding="5 5"
-                x:Name="ExactPhrase"
-                IsChecked="{x:Null}"
-                IsThreeState="True"
-                Margin="10"
-                Content="Similar"
-                IsCheckedChanged="SettingChanged"/>
+            <Button Content="Difficulty"
+                    Background="White"
+                    BorderBrush="Black"
+                    Height="40"
+                    Width="130"
+                    Margin="10 0 0 0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
 
-            <ComboBox x:Name="Difficulties"
-                      SelectedIndex="0"
-                      Width="200"
-                      Height="40"
-                      MaxDropDownHeight="200"
-                      IsDropDownOpen="True"
-                      DropDownClosed="Difficulties_OnDropDownClosed"
-                      Margin="15,10,10,10">
-                <!--“Title” item (disabled)-->
-                <ComboBoxItem IsEnabled="False"
-                              Content="Difficulties" />
-                <!--Difficulty Options-->
-                <ComboBoxItem  Padding="5 " Height="40" >
-                    <CheckBox Tag="0" Height="41" Padding="10" Margin="0 0 0 0" VerticalContentAlignment="Stretch"  Width="200" Content="0 - Trash" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-                <!-- Padding="15 10 30 10" --> 
-                <ComboBoxItem  Padding="5 " Height="40" >
-                    <CheckBox Tag="1" Height="41" Padding="10" Margin="0 0 0 0" VerticalContentAlignment="Stretch"  Width="200" 
-                              Content="1 - Middle School" 
-                              IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-                <ComboBoxItem Padding="5 " Height="40" >
-                    <CheckBox Tag="2" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="2 - Easy High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"  />
-                </ComboBoxItem>
+                <Button.Flyout>
+                    <MenuFlyout >
+                        
+                        <!--ReSharper disable InconsistentNaming-->
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_0" Header="0 - Trash" PointerPressed="ToggleButton_OnIsCheckedChanged" /> 
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_1" Header="1 - Middle School" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_2" Header="2 - Easy High School" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_3" Header="3 - Regular High School" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_4" Header="4 - Hard High School" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_5" Header="5 - Nationals High School" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_6" Header="6 - Easy College" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_7" Header="7 - Regular College" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_8" Header="8 - Hard College" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_9" Header="9 - Nationals College" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="_10" Header="10 - Open" PointerPressed="ToggleButton_OnIsCheckedChanged" />
+                        <MenuItem StaysOpenOnClick="True" Header="-" />
+                        <!--ReSharper restore InconsistentNaming-->
+                        <MenuItem Tag="{x:False}" Header="Toggle All" StaysOpenOnClick="True" PointerPressed="ToggleAllDifficulties"/>
+                        <MenuItem Header="Close" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+            
+                        
+            <Button Content="Tossup / Bonus"
+                    Background="White"
+                    BorderBrush="Black"
+                    Height="40"
+                    Width="130"
+                    Margin="10 0 0 0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
+
+                <Button.Flyout>
+                    <MenuFlyout >
+                        <!--ReSharper disable InconsistentNaming-->
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="tossup" Header="Tossups" PointerPressed="TossupsOrBonuses_OnChecked" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="bonus" Header="Bonuses" PointerPressed="TossupsOrBonuses_OnChecked" />
+                        <MenuItem StaysOpenOnClick="True" Header="-" />
+                        <!--ReSharper restore InconsistentNaming-->
+                        <MenuItem Header="Close" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+            
+            <Button Content="Question / Answer"
+                    Background="White"
+                    BorderBrush="Black"
+                    Height="40"
+                    Width="140"
+                    Margin="10 0 0 0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
+
+                <Button.Flyout>
+                    <MenuFlyout >
+                        <!--ReSharper disable InconsistentNaming-->
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="question" Header="Questions" PointerPressed="QuestionOrAnswer_OnChecked" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="answer" Header="Answers" PointerPressed="QuestionOrAnswer_OnChecked" />
+                        <MenuItem StaysOpenOnClick="True" Header="-" />
+                        <!--ReSharper restore InconsistentNaming-->
+                        <MenuItem Header="Close" />
+                    </MenuFlyout>
+                </Button.Flyout>
                 
-                <ComboBoxItem Padding="5 " Height="40" >
-                    <CheckBox  Tag="3" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="3 - Regular High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"  />
-                </ComboBoxItem>
-                <ComboBoxItem Padding="5 " Height="40" >
-                    <CheckBox  Tag="4" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200" Content="4 - Hard High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"  />
-                </ComboBoxItem>
-                <ComboBoxItem Padding="5 " Height="40" >
-                    <CheckBox  Tag="5" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200" Content="5 - Nationals High School" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-                <ComboBoxItem  Padding="5 " Height="40" >
-                    <CheckBox  Tag="6" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="6 - Easy College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-                <ComboBoxItem   Padding="5 " Height="40" >
-                    <CheckBox Tag="7" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="7 - Regular College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-                <ComboBoxItem  Tag="1"  Padding="5 " Height="40" >
-                    <CheckBox Tag="8" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="8 - Hard College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-                <ComboBoxItem Padding="5 " Height="40">
-                    <CheckBox Tag="9" Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200"  Content="9 - Nationals College" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-                <ComboBoxItem Padding="5" Height="40">
-                    <CheckBox Tag="10"  Height="41" Padding="10" Margin="0" VerticalContentAlignment="Stretch"  Width="200" Content="10 - Open" IsCheckedChanged="ToggleButton_OnIsCheckedChanged" />
-                </ComboBoxItem>
-            </ComboBox>         
+            </Button>
+            
+            <Button Content="Precision"
+                    Background="White"
+                    BorderBrush="Black"
+                    Height="40"
+                    Width="150"
+                    Margin="10 0 0 0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
+
+                <Button.Flyout>
+                    <MenuFlyout >
+                        <!--ReSharper disable InconsistentNaming-->
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="exact" Header="Exact" PointerPressed="Strictness_OnChecked" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="similar" Header="Similar" PointerPressed="Strictness_OnChecked" />
+                        <MenuItem StaysOpenOnClick="True" Tag="{x:False}" x:Name="explore" Header="Explore" PointerPressed="Strictness_OnChecked" />
+                        <MenuItem StaysOpenOnClick="True" Header="-" />
+                        <!--ReSharper restore InconsistentNaming-->
+                        <MenuItem Header="Close" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+            
+            <Border Margin="10 0 0 0" Padding = "10 -5" Height="40" BorderBrush="Black" BorderThickness="1" CornerRadius="4"><StackPanel Orientation="Horizontal" >
+                
+                <TextBlock Text="Strictness (Less = More): " VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding #Strictness.Value}" VerticalAlignment="Center"/>
+                <Slider Margin="10 0" MinWidth="100" x:Name="Strictness" Minimum="0.0" Maximum="1.0" TickFrequency="0.1" IsSnapToTickEnabled="True"
+                        Value="{Binding Strictness, Mode=TwoWay}" PointerMoved="Search"/>
+                
+            </StackPanel></Border>
+            
+
         </StackPanel>
 
-        <Grid Grid.Row="1"
-              ColumnDefinitions="*,*"
-              Margin="10"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Stretch">
-            
-            <ScrollViewer Grid.Column="0"
-                          BorderBrush="Black"
-                          BorderThickness="2"
-                          VerticalScrollBarVisibility="Auto">
-                <ListBox
-                         ItemsSource="{Binding Results}" 
-                         SelectionMode="Single" Background="WhiteSmoke"
-                         >
-                    
+        <!-- Main Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="10" PointerPressed="SearchResultMenu_OnPressed">
+            <!-- Results List -->
+            <ScrollViewer Grid.Column="0" BorderBrush="Black" BorderThickness="2" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="ListBox" ItemsSource="{Binding Results}" SelectionMode="Single" Background="WhiteSmoke">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <VirtualizingStackPanel/>
+                            <VirtualizingStackPanel x:Name="VirtualizingStackPanel" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
-                
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Margin="5,2"
+                            <Border x:Name="boarder"
+                                    Background="Transparent"
+                                    Margin="5,2"
                                     CornerRadius="4"
                                     BorderBrush="Gray"
-                                    BorderThickness="1">
-                                <TextBlock Text="{Binding}"
-                                           Margin="10"
-                                           TextWrapping="Wrap"/>
+                                    BorderThickness="1"
+                                    PointerPressed="SearchResultMenu_OnPressed">
+                                <TextBlock x:Name="block"
+                                           Text="{Binding}"
+                                           Margin="6"
+                                           FontSize="14"
+                                           Background="WhiteSmoke"
+                                           
+                                           TextWrapping="Wrap"
+                                           PointerPressed="SearchResultMenu_OnPressed"/>
+                                <Border.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuItem x:Name="Copy" Header="Copy" Click="OnCopyItem" Tag="{Binding}" />
+                                        <MenuItem Header="Paste" Click="OnPasteItem" Tag="{Binding}"/>
+                                    </MenuFlyout>
+                                </Border.ContextFlyout>
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </ScrollViewer>
-
-            <ScrollViewer Grid.Column="1"
-                          Margin="10 0 30 0"
-                          VerticalScrollBarVisibility="Auto">
-                <!--edit?--> 
-                <TextBox x:Name="TextDump"
-                         Text="{Binding TextDump, FallbackValue='Wait..'}"
-                         TextAlignment="Start"
-                         TextWrapping="WrapWithOverflow" 
-                />
+      
+            <!-- Text Dump -->
+            <ScrollViewer Grid.Column="1" Margin="10 0 30 0" VerticalScrollBarVisibility="Auto">
+                <TextBox x:Name="TextDump" Text="{Binding TextDump, FallbackValue='Wait..'}"
+                         TextAlignment="Start" TextWrapping="WrapWithOverflow"/>
             </ScrollViewer>
         </Grid>
     </Grid>

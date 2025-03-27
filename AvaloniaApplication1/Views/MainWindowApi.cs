@@ -12,6 +12,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Microsoft.ML;
 using Filterinator2000.Models;
@@ -22,37 +24,19 @@ namespace Filterinator2000.Views;
 
 public partial class MainWindow
 {
-    private StringBuilder _sb = new();
-
-    private static string QuestionType
-    {
-        get => _questionType;
-        set => _questionType = EnsureAcceptable(value, ["all", "tossup", "bonus"]);
-    }
-
-    private static string SearchType
-    {
-        get => _searchType;
-        set => _searchType = EnsureAcceptable(value, ["all", "question", "answer"]);
-    } 
-    
-    private static bool? Exact
-    {
-        get => _exact;
-        set => _exact = value;
-    }
-
-
+    private static StringBuilder _sb = new();
 
     private void Error(string console, string display)
     {
-        Console.Error.WriteLine(console);
+        sb.AppendLine(console);
         TextDump.Text = display;
         TextDump.Background = Brushes.Red;
     }
 
+    private static StringBuilder sb = new(500); 
     private async void QbReaderRequest(string text)
     {
+        sb.Clear(); 
         switch (text.Length)
         {
             case 0:
@@ -69,15 +53,38 @@ public partial class MainWindow
 
         TextDump.Watermark = string.Empty;
 
-        _searchButton.Content = buttonContent.ring;
+        _searchButton.Content = _buttonContent.ring;
         var query = Uri.EscapeDataString(text);
-        if (Exact == true)
+        var Exact = EnabledMode.Contains("exact");
+        var Similar = EnabledMode.Contains("Similar"); 
+        if (Exact)
         {
-            query = string.Format(pendanticTemplate, Regex.Escape(query)) + "&regex=true"; 
+            query = @$"^(?!.*[\(\{{\[][^)\}}\]]*\b{query}\b[^)\}}\]]*[\)\}}\]]).*\b{query}\b.*$" + "&regex=true";
         }
+        else if (Similar)
+        {
+            query = $@"\b{query}\b" + "&regex=true";
+        }
+
+        
+        var questionType = EnabledQuestionTypes.ToList() switch
+        {
+            ["tossup"] => "tossup",
+            ["bonus"] => "bonus",
+            _ => "all"
+        };
+        
+        var searchType = EnabledQuestionParts.ToList() switch
+        {
+            ["question"] => "question",
+            ["answer"] => "answer",
+            _ => "all"
+        };
+        
+        
         var args =
-            $"?queryString={query}&questionType={QuestionType}&searchType={SearchType}&exactPhrase={(Exact ?? true ? "true" : "false")}&difficulties={string.Join(',', EnabledDifficulties)}";
-        Console.WriteLine("Querying: " + args);
+            $"?queryString={query}&questionType={questionType}&searchType={searchType}&exactPhrase={(Exact || Similar ? "false" : "true")}&difficulties={string.Join(',', EnabledDifficulties)}&categories={string.Join(',', EnabledCategories)}&subcategories={string.Join(',', EnabledSubCategories)}&alternateSubcategories={string.Join(',', EnabledAlternateSubCategories)}";
+        sb.AppendLine("[Query]" + args + @"[\EndQuery]");
         using var response = await _client.GetAsync(args);
 
         CheckInternetSpeed(); 
@@ -150,12 +157,13 @@ public partial class MainWindow
             case HttpStatusCode.ServiceUnavailable:
                 Error("Service Unavailable. This is because the server is down or overloaded, or the user is spamming things.",
                     """
-                    Service Unavailable. This error happens for several reasons:
-                    - (Most Likely) You need to slow down. You are sending too many requests to QB Reader at once.
-                    - (Possible) High traffic for QB Reader (wait a bit)
-                    - (Rare) Scheduled Maintenance
-                    - (Improbable) QB Reader is misconfigured. If you are getting this message at uncommon hours,
-                      but the server is up, contact Geoffrey please (geoffreywu1000@gmail).
+                    >>> SERVICE UNAVAILABLE <<<
+                    This is the most common error. This can happen for a few reasons:
+                    - The user (you) is spamming the search button. Please don't do that.
+                    - QB Reader is down. Try again later. 
+                    - QB Reader is overloaded. Try again.
+                    - Your internet is either (a) too slow or (b) preventing you from accessing QB Reader. Check your network settings.
+                    If you would like to see if it is the app or QB Reader that is causing a problem
                     """); 
                 return;
             case HttpStatusCode.GatewayTimeout:
@@ -241,7 +249,7 @@ public partial class MainWindow
 
         TextDump.Background = Brushes.White;
 
-        var result = ProcessResult(await response.Content.ReadFromJsonAsync<QbReaderResponse>(new JsonSerializerOptions
+        ProcessResult(await response.Content.ReadFromJsonAsync<QbReaderResponse>(new JsonSerializerOptions
         {
             AllowOutOfOrderMetadataProperties = true,
             AllowTrailingCommas = true,
@@ -249,7 +257,7 @@ public partial class MainWindow
             TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         }));
 
-        _searchButton.Content = buttonContent.image;
+        _searchButton.Content = _buttonContent.search;
 
     }
 
@@ -262,117 +270,217 @@ public partial class MainWindow
             Error("No Internet Connection", "No internet connection. Please check your network settings.");
         }
     }
-
-    private QbReaderResponse ProcessResult(QbReaderResponse? readFromJsonAsync)
+private void ProcessResult(QbReaderResponse? readFromJsonAsync)
+{
+    if (readFromJsonAsync is null)
     {
-        _sb.Clear(); 
-        TextDump.Text = string.Empty;
-        MainWindowViewModel.Results.Clear();
-
-
-        // Dictionary<string, string> clueToAnswer =
-        //    new((int)BitOperations.RoundUpToPowerOf2((uint)(readFromJsonAsync!.Tossups!.Count + readFromJsonAsync.Bonuses!.Count * 10))); 
-        
-        
-        if (readFromJsonAsync!.Tossups!.Count > 0){
-
-                foreach (var (question, answer) in readFromJsonAsync.Tossups!.QuestionArray.AsParallel().Select(t => (t.Question, t.Answer)))
-                {
-                    
-                    _sb.AppendLine(question);
-                    _sb.AppendLine("ANSWER: " + answer + "\n"); 
-                }
-        }
-        
-
-        _sb.AppendLine();
-
-        if (readFromJsonAsync.Bonuses!.Count > 0)
-        {
-            foreach (var (question, answer) in readFromJsonAsync.Bonuses!.QuestionArray.AsParallel().SelectMany(b => b.Questions).Zip(readFromJsonAsync.Bonuses!.QuestionArray.AsParallel().SelectMany(b => b.Answers)))
-            {
-                _sb.AppendLine(question);
-                _sb.AppendLine("ANSWER: " + answer);
-                
-                }
-        }
-
-        var text = RemovePeriodsFromAcronyms(RemoveParenthases.Replace(_sb.ToString(), string.Empty).Replace(".name ", ". Name "));
-
-        if (string.IsNullOrWhiteSpace(text)) return readFromJsonAsync;
-        TextDump.Text = text;
-
-
-        var sentences = Sentence().Matches(RemoveAnswer().Replace(text, string.Empty)).AsParallel()
-            .Select(m => m.Value.Trim());
-
-        RemoveSimilar(sentences).ForEach(MainWindowViewModel.Results.Add);
-        
-        Console.WriteLine(MainWindowViewModel.Results.Count);
-
-
-        return readFromJsonAsync;
+        TextDump.Text = "No data provided.";
+        return;
     }
 
-    private List<string> RemoveSimilar(ParallelQuery<string> sentences)
+    // Reset state and UI elements.
+    _sb.Clear();
+    TextDump.Text = string.Empty;
+    MainWindowViewModel.Results.Clear();
+
+    // Process Tossups (no filtering needed)
+    if (readFromJsonAsync.Tossups?.Count > 0)
     {
-        
-        var mlContext = new MLContext();
-        var data = sentences.Select(s => new SentenceData { Text = s }).ToList();
-        IDataView dataView = mlContext.Data.LoadFromEnumerable(data);
-
-        var pipeline = mlContext.Transforms.Text.FeaturizeText(
-            outputColumnName: "Features",
-            inputColumnName: nameof(SentenceData.Text));
-
-        var model = pipeline.Fit(dataView);
-        var transformedData = model.Transform(dataView);
-        var featureColumn = transformedData
-            .GetColumn<float[]>("Features")
-            .ToArray();
-        var representatives = new List<int>();
-        for (int i = 0; i < featureColumn.Length; i++)
+        foreach (var tossup in readFromJsonAsync.Tossups.QuestionArray)
         {
-            bool isDuplicate = false;
-            foreach (int repIdx in representatives)
+            _sb.AppendLine(tossup.Question);
+            _sb.AppendLine($"ANSWER: {tossup.Answer}\n");
+        }
+    }
+
+    // Process Bonuses with filtering applied.
+    if (readFromJsonAsync.Bonuses?.Count > 0)
+    {
+        // Zip bonus questions with answers.
+        var bonusQuestions = readFromJsonAsync.Bonuses.QuestionArray.SelectMany(b => b.Questions);
+        var bonusAnswers = readFromJsonAsync.Bonuses.QuestionArray.SelectMany(b => b.Answers);
+        foreach (var (question, answer) in bonusQuestions.Zip(bonusAnswers, (q, a) => (q, a)))
+        {
+            
+            if (!EnabledMode.Contains("explore") && !ShouldIncludeBonus(question, answer, _sBox.Text, EnabledQuestionParts))
             {
-                float sim = CosineSimilarity(featureColumn[i], featureColumn[repIdx]);
-                if (sim >= 0.8f) // threshold can be tuned
-                {
-                    isDuplicate = true;
-                    break;
-                }
+                continue;
             }
-            if (!isDuplicate)
-                representatives.Add(i);
+            _sb.AppendLine(question);
+            _sb.AppendLine($"ANSWER: {answer}");
         }
-
-        return representatives.Select(i => data[i].Text).ToList(); 
-
-
-
-
     }
-    private static float CosineSimilarity(float[] vecA, float[] vecB)
+
+    // Clean and post-process the built text.
+    var rawText = _sb.ToString();
+    // First remove parenthesized text and fix known typos.
+    var cleanedText = RemoveParenthases.Replace(rawText, string.Empty)
+                                          .Replace(".name ", ". Name ");
+    cleanedText = Spaces().Replace( RemovePeriodsFromAcronyms(cleanedText), " ");
+
+    if (string.IsNullOrWhiteSpace(cleanedText))
     {
-        if (vecA.Length != vecB.Length)
-            throw new ArgumentException("Vectors must be the same length.");
-
-        float dot = 0f;
-        float normA = 0f;
-        float normB = 0f;
-
-        for (var i = 0; i < vecA.Length; i++)
-        {
-            dot += vecA[i] * vecB[i];
-            normA += vecA[i] * vecA[i];
-            normB += vecB[i] * vecB[i];
-        }
-
-        return (float)(dot / (Math.Sqrt(normA) * Math.Sqrt(normB)));
+        TextDump.Text = "No results found. Try expanding your applied filters, or search for something else.";
+        return;
     }
 
-    
+    TextDump.Text = cleanedText; 
+    var content = RemoveAnswer().Replace(cleanedText, string.Empty); 
+    var sentences = Sentence().Matches(content).AsParallel().Select(m => m.Value);
+    var sentenceMatches = sentences
+        .Select(s => s.Trim())
+        .Where(s => !string.IsNullOrEmpty(s));
+
+    // Remove similar sentences using ML.NET–based cosine similarity.
+    var uniqueSentences = RemoveSimilar(sentenceMatches);
+    uniqueSentences.ForEach(MainWindowViewModel.Results.Add);
+
+    sb.AppendLine($"Unique sentence count: {MainWindowViewModel.Results.Count}");
+    sb.AppendLine("[End]");
+    Console.WriteLine(sb.ToString()); 
+}
+
+/// <summary>
+/// Determines whether a bonus question/answer pair should be included based on the search filter and enabled parts.
+/// </summary>
+private bool ShouldIncludeBonus(string question, string answer, string filterText, IEnumerable<string> enabledParts)
+{
+    // Check if the filter text is contained in the question or answer.
+    var containsQuestion = question.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+    var containsAnswer = answer.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+    var questionEnabled = enabledParts.Contains("question", StringComparer.OrdinalIgnoreCase);
+    var answerEnabled = enabledParts.Contains("answer", StringComparer.OrdinalIgnoreCase);
+
+    if (questionEnabled && !answerEnabled)
+    {
+        return containsQuestion;
+    }
+    if (answerEnabled && !questionEnabled)
+    {
+        return containsAnswer;
+    }
+    // When both (or neither) are enabled, require at least one match.
+    return containsQuestion || containsAnswer;
+}
+
+private static readonly MLContext s_mlContext = new MLContext();
+
+/// <summary>
+/// Removes sentences that are too similar based on a combination of ML.NET cosine similarity
+/// (with precomputed norms) and Jaccard similarity computed on significant words (after removing
+/// non-significant qualifiers). The filtering is controlled by MainWindowViewModel.Strictness, where
+/// 1.0 is lenient (includes nearly everything) and 0.0 is very strict.
+/// </summary>
+private static List<string> RemoveSimilar(IEnumerable<string> sentences)
+{
+    // --- Preprocessing ---
+    // Remove quiz bowl qualifiers that are not significant.
+    var qualifiersPattern = MyRegex();
+    // Minimal stop-word list.
+    var stopwords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "the", "a", "an", "and", "or", "but", "if", "is", "in", "at", "of", "on"
+    };
+
+    // Process each sentence once.
+    var processedSentences = new List<(string Original, string Processed, HashSet<string> SignificantWords)>();
+    foreach (var sentence in sentences)
+    {
+        // Remove qualifiers and extra spaces.
+        var processed = qualifiersPattern.Replace(sentence, string.Empty);
+        processed = Spaces().Replace(processed, " ").Trim();
+
+        // Split into words and filter out short or unimportant words.
+        var words = processed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var significantWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var word in words)
+        {
+            if (word.Length > 2 && !stopwords.Contains(word))
+            {
+                significantWords.Add(word.ToLowerInvariant());
+            }
+        }
+
+        // Only include sentences that have at least one significant word.
+        if (significantWords.Count > 0)
+        {
+            processedSentences.Add((sentence, processed, significantWords));
+        }
+    }
+    if (processedSentences.Count == 0)
+    {
+        return new List<string>();
+    }
+
+    // --- ML.NET Feature Extraction ---
+    // Build feature vectors from the processed text.
+    var data = processedSentences
+        .Select(ps => new SentenceData { Text = ps.Processed })
+        .ToList();
+    var dataView = s_mlContext.Data.LoadFromEnumerable(data);
+    var pipeline = s_mlContext.Transforms.Text.FeaturizeText(
+        outputColumnName: "Features",
+        inputColumnName: nameof(SentenceData.Text));
+    var model = pipeline.Fit(dataView);
+    var transformedData = model.Transform(dataView);
+    var featureColumn = transformedData.GetColumn<float[]>("Features").ToArray();
+
+    // --- Precompute Norms ---
+    // Compute Euclidean norms for each feature vector.
+    int n = featureColumn.Length;
+
+
+    // --- Similarity Filtering ---
+    // Use MainWindowViewModel.Strictness as a similarity threshold.
+    var similarityThreshold = MainWindowViewModel.Strictness;
+    var representatives = new List<int>(); // Holds indices of unique sentences.
+
+    // For each sentence, compare it against previously accepted representatives.
+    for (int i = 0; i < n; i++)
+    {
+        bool isDuplicate = false;
+        for (int k = 0; k < representatives.Count; k++)
+        {
+            int repIdx = representatives[k];
+            float cosine = CosineSimilarity(featureColumn[i], featureColumn[repIdx]);
+            float jaccard = JaccardSimilarity(processedSentences[i].SignificantWords, processedSentences[repIdx].SignificantWords);
+            float combinedSimilarity = 0.7f * cosine + 0.3f * jaccard;
+            if (combinedSimilarity >= similarityThreshold)
+            {
+                isDuplicate = true;
+                break;
+            }
+        }
+        if (!isDuplicate)
+        {
+            representatives.Add(i);
+        }
+    }
+
+    // --- Build and Return Result ---
+    var result = new List<string>(representatives.Count);
+    foreach (int idx in representatives)
+    {
+        result.Add(processedSentences[idx].Original);
+    }
+    sb.AppendLine($"RemoveSimilar returning {result.Count} unique sentences after optimization.");
+    return result;
+}
+
+
+
+/// <summary>
+/// Computes the Jaccard similarity between two sets of strings.
+/// </summary>
+private static float JaccardSimilarity(HashSet<string> setA, HashSet<string> setB)
+{
+    if (setA.Count == 0 || setB.Count == 0)
+        return 0f;
+    var intersectionCount = setA.Intersect(setB).Count();
+    var unionCount = setA.Union(setB).Count();
+    return (float)intersectionCount / unionCount;
+}
+
     
     public static string RemovePeriodsFromAcronyms(string input)
     {
@@ -393,7 +501,7 @@ public partial class MainWindow
     private static string _searchType = "all";
     private static string _questionType = "all";
     private static bool? _exact = null; 
-    const string pendanticTemplate = @"\b{0}\b(?=[\[(])|^(?!.*[\[(]).*\b{0}\b";
+    const string pendanticTemplate = @"(^[^A-z]*\b{0}\b(?=.*\[))|(\b{0}\b(?=.*for 10 points))|(For 10 points.+{0}\b)";
 
 
     [GeneratedRegex(@"(\(.+?\))|(\[.+?\])|( ?for 10 points( |, )?)", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
@@ -406,5 +514,9 @@ public partial class MainWindow
     private static partial Regex PureAnswer();
     
     [GeneratedRegex(@"^ANSWER:.*$", RegexOptions.Compiled | RegexOptions.Multiline)]
-    private static partial Regex RemoveAnswer(); 
+    private static partial Regex RemoveAnswer();
+    [GeneratedRegex(@" {2,}")]
+    private static partial Regex Spaces();
+    [GeneratedRegex(@"\b(this|these|where|here)\b", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex MyRegex();
 }
