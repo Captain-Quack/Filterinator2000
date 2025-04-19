@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication1", "AvaloniaApplication1\AvaloniaApplication1.csproj", "{304B6D12-3E9A-492B-90F7-0CE5492FB157}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filterinator2000", "Filterinator2000\Filterinator2000.csproj", "{304B6D12-3E9A-492B-90F7-0CE5492FB157}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

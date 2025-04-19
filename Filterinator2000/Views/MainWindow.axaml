@@ -6,7 +6,11 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Filterinator2000.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Filterinator2000">
+        Title="Filterinator2000"
+        SizeToContent="WidthAndHeight"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        >
     
 
     <Design.DataContext>
@@ -20,12 +24,11 @@
     <Grid RowDefinitions="Auto,*">
         
         <!-- TOP ROW (Auto): your 'navigation bar' -->
-        <StackPanel  x:Name="StackPanelTop" Grid.Row="0" Orientation="Horizontal" Height="50"  Margin="10">
-            <Button/>
+        <StackPanel x:Name="StackPanelTop" Grid.Row="0" Orientation="Horizontal" Height="50"  Margin="10" Spacing="-2">
 
             <Button
                 x:Name="SearchButton"
-                Width="60"
+                Width="50"
                 Height="40"
                 Margin="10  0 -5 0"
                 Background="White"
@@ -52,7 +55,7 @@
                     Background="White"
                     BorderBrush="Black"
                     Height="40"
-                    Width="130"
+                    Width="100"
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center">
@@ -139,7 +142,7 @@
                     Background="White"
                     BorderBrush="Black"
                     Height="40"
-                    Width="130"
+                    Width="100"
                     Margin="10 0 0 0"
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Center"
@@ -173,7 +176,7 @@
                     Background="White"
                     BorderBrush="Black"
                     Height="40"
-                    Width="130"
+                    Width="140"
                     Margin="10 0 0 0"
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Center"
@@ -218,7 +221,7 @@
                     Background="White"
                     BorderBrush="Black"
                     Height="40"
-                    Width="150"
+                    Width="100"
                     Margin="10 0 0 0"
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Center"

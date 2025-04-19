@@ -1,7 +1,7 @@
 ﻿<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AvaloniaApplication1" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false">
-    <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/AvaloniaApplication1/AvaloniaApplication1.csproj" />
-    <option name="PROJECT_TFM" value="net9.0" />
+    <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/Filterinator2000/Filterinator2000.csproj" />
+    <option name="PROJECT_TFM" value="" />
     <option name="LAUNCH_PROFILE_NAME" value="" />
     <option name="TRACK_ARGUMENTS" value="1" />
     <option name="ARGUMENTS" value="" />

@@ -33,7 +33,7 @@ public partial class MainWindow
         TextDump.Background = Brushes.Red;
     }
 
-    private static StringBuilder sb = new(500); 
+    private static readonly StringBuilder sb = new(500); 
     private async void QbReaderRequest(string text)
     {
         sb.Clear(); 

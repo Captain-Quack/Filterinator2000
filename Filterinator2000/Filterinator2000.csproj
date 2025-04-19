@@ -3,14 +3,32 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <OutputType>WinExe</OutputType>
+        <UseWpf>false</UseWpf>
+        <UseWindowsForms>false</UseWindowsForms>
+        <PublishSingleFile>true</PublishSingleFile>
+        <PublishTrimmed>true</PublishTrimmed> <!-- Optional, may break stuff -->
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>preview</LangVersion>
-        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
+
+        <EnableMLUnsupportedPlatformTargetCheck>false</EnableMLUnsupportedPlatformTargetCheck>
         <SelfContained>true</SelfContained>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
+    <PropertyGroup>
+        <Company>MPT/YN Productions</Company>
+        <Authors>Mason</Authors>
+        <Product>Filterinator</Product>
+        <Version>1.0.0</Version>
+        <FileVersion>1.0.0.0</FileVersion>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <Description>Short description of your app</Description>
+        <Copyright>© Your Name 2025</Copyright>
+    </PropertyGroup>
+
 
     <ItemGroup>
         <!-- Include the entire Assets folder, preserving its structure -->
